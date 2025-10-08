@@ -55,15 +55,24 @@ let searchResultsContainer: HTMLDivElement;
 let sideResultsContainer: HTMLDivElement;
 
 function main() {
-  searchResultsContainer = document.querySelector("[jscontroller='XW992c']")!;
-  sideResultsContainer = document.querySelector("#TWfxFb")!;
-  if (searchResultsContainer) addGifsButton();
-  else intervalSolution(3000);
-  // loadGifsBatchData();
-  observerSolution();
+  // Update: Use a more reliable selector for the main image grid container.
+  searchResultsContainer = document.querySelector("#islrg") as HTMLDivElement; // Update: Use a modern selector for the side/detailed results panel.
+  sideResultsContainer = document.querySelector(
+    "div[data-s2]"
+  ) as HTMLDivElement;
+  if (searchResultsContainer) {
+    addGifsButton();
+    observerSolution();
+  } else {
+    // If the main container isn't found, fall back to the interval solution
+    customLog(
+      "Main image container not found. Falling back to interval solution.",
+      true
+    );
+    intervalSolution(3000);
+  } // Always run an initial search update
   updateSearchResults();
 }
-
 /* function loadGifsBatchData() {
   document.querySelectorAll("script").forEach((script) => {
     gifsBatchData += script.textContent || "";
@@ -95,13 +104,15 @@ function intervalSolution(interval: number) {
 }
 
 function updateSearchResults(container: Document | Element | null = document) {
-  // const tmp = container == document ? "document" : "container";
-  // customLog(`Executing updateSearchResults() on ${tmp}`);
+  // Update: Include modern image classes.
+  // .Q4LuWd and .YQ4gaf are the old selectors.
+  // .iPVvWb and .rg_i are current image thumbnail classes.
   container
-    ?.querySelectorAll<HTMLImageElement>("a img[jsname='Q4LuWd'], a img.YQ4gaf")
+    ?.querySelectorAll<HTMLImageElement>(
+      "a img[jsname='Q4LuWd'], a img.YQ4gaf, a img.iPVvWb, img.rg_i"
+    )
     .forEach(updateSearchResult);
 }
-
 const visitedImages = new Set<HTMLImageElement>();
 
 function updateSearchResult(image: HTMLImageElement) {
@@ -167,8 +178,12 @@ function createGif(src: string) {
 }
 
 async function addGifsButton() {
-  const gifsSearchParam = "&tbs=itp:animated";
-  const itemsContainer = document.querySelector(".crJ18e")!;
+  const gifsSearchParam = "&tbs=itp:animated"; // Update: Use a more reliable selector for the filter bar container. // The filter bar is often a flex container or a div with role="navigation".
+  const itemsContainer = document.querySelector(".crJ18e, .T5zQre")!; // Added .T5zQre (common filter bar class)
+  if (!itemsContainer) {
+    customLog("Filter bar container not found. Cannot add GIFs button.", true);
+    return;
+  }
   const activeItem = itemsContainer.querySelector(
     ":scope > div:has([selected])"
   )!;
